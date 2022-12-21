@@ -1,9 +1,9 @@
 # Octavia
-The not-so-friendly chatbot, a Meower port of Octavia! from Scratch. Also a template for Python bots.
+The not-so-friendly chatbot, a Meower port of Octavia! from Scratch.
 
 > **Warning**
 >
-> Octavia will not work on the current Meower server as Meower has not been upgraded to use Cloudlink 4. Please visit [this branch](https://github.com/meower-media-co/Meower-Server/tree/main-cl4-port) for updates.
+> Octavia will not work on the current Meower server as Meower has not been upgraded to use Cloudlink 4.
 
 ## Chat with Octavia
 Simply @Octavia in Meower's home page and Octavia will respond!
@@ -35,9 +35,6 @@ and Octavia will connect to Meower and start listening for requests.
 
 ## Future improvements
 * ~~Add a real natural-language AI~~ Outside of scope of original project idea.
-* ~~Add options to use different databases other than TinyDB~~ Will likely use MongoDB in the future.
+* ~~Add options to use different databases other than TinyDB~~ Will likely use MontyDB in the future.
 * Add feature to allow talking to Octavia in Meower chats/DMs.
-* Add per-message custom PFPs to show Octavia's expressions. *(Will not be implemented until Meower B6)*
-
-## License
-Octavia is licensed using Meower's [MEOW License.](https://github.com/meower-media-co/Octavia/blob/main/LICENSE) You are completely free to use this source code in any way, shape, or form, with or without credit, for commerical or personal use. You are also free to change, remove, or keep this license. **Absolutely no patent use is permitted.**
+* Add per-message custom PFPs to show Octavia's expressions. *(Will not be implemented until Meower Release 1)*
