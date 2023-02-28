@@ -1,40 +1,49 @@
 # Octavia
-The not-so-friendly chatbot, a Meower port of Octavia! from Scratch.
-
-> **Warning**
->
-> Octavia will not work on the current Meower server as Meower has not been upgraded to use Cloudlink 4.
-
-## Chat with Octavia
-Simply @Octavia in Meower's home page and Octavia will respond!
+Source code for the not-so-friendly chatbot, "Octavia". A fork of the "MeowyMod" bot, inspired by the [Octavia chat bot on Scratch.](https://scratch.mit.edu/projects/402821371/)
 
 > **Note**
 >
-> You can say hello to Octavia's [original incarnation](https://scratch.mit.edu/projects/402821371/) on Scratch.
+> Octavia is being rewritten.
 
-## Making your own responses
-If Octavia doesn't know how to respond to a question, she will ask you to input a response or you can tell Octavia "nevermind". You can add any kind of message response. There are some extra features you can add to a response.
+<!-- TODO: Rewrite this
+# 💡 Features 💡
+### 👨‍💻 Friendly commands
+Simply @MeowyMod in Meower to utilize the bot. Commands are listed below, or can be accessed by using `@MeowyMod help`.
 
-> Hello, [username]!
+### 🪶 Fast and lightweight 
+MeowyMod can run on minimal resources. At least 32MB of RAM and any reasonably capable CPU can run MeowyMod.
 
-Adding "[username]" to a response will add the origin username.
+### 📃 Feature-Rich
+* Ability to update
+* Ability to self-restart
+* Create announcements and warnings
+* User promotion/demotion
+* Supports account kicks/bans/pardons, as well as IP bans/pardons.
+* Ticket logging
+* Announcements
+* **Missing features:** Reports management
 
-> I have stored [size] responses in my brain!
+> **Note**
+>
+> main.py can be updated using the `@MeowyBot update` command, but the MeowerBot library will require manual updates.
 
-Adding [size] will return the total count of all responses in TinyDB.
+# 📦 Dependencies 📦
+* 🐍 Python >=3.11
+* 🤖 MeowerBot.py >=2.4.5 (Built-in)
+* 🗂️ PyMongo
+* 🗄 dotenv
+* 🌐 CloudLink 3 Client (Component of MeowerBot.py)
 
-## Setup
-Before creating your own bot using Octavia's source code, you will need to create an account dedicated to your bot. Simply create an account from any Meower client and store the username and password of the bot in main.py.
-
-Before you use your bot, you must install dependencies. This bot is bundled with Cloudlink 4.
-`python3 -m pip install -r requirements.txt`
-
-To run your bot, simply use
-`python3 main.py`
-and Octavia will connect to Meower and start listening for requests.
-
-## Future improvements
-* ~~Add a real natural-language AI~~ Outside of scope of original project idea.
-* ~~Add options to use different databases other than TinyDB~~ Will likely use MontyDB in the future.
-* Add feature to allow talking to Octavia in Meower chats/DMs.
-* Add per-message custom PFPs to show Octavia's expressions. *(Will not be implemented until Meower Release 1)*
+# ⌨ Commands ⌨
+* `@MeowyMod help` - Displays a list of commands.
+* `@MeowyMod meow` - MeowyMod will Meow, because it is indeed a Cat.
+* `@MeowyMod update` - Checks and applies new updates to the bot.
+* `@MeowyMod kick (username)` - Disconnects a user from Meower.
+* `@MeowyMod ban (username)` - Bans a user from Meower.
+* `@MeowyMod pardon (username)` - Pardons a ban for a user on Meower.
+* `@MeowyMod ipban (username)` - Blocks the IP address of a user on Meower.
+* `@MeowyMod ippardon (username)` - Pardons blocked IP addresses for a user on Meower.
+* `@MeowyMod announce (announcement)` - Creates a Meower-wide announcement.
+* `@MeowyMod warn (username) (message)` - Sends a warning message to a user's inbox on Meower.
+* `@MeowyMod setlevel (username) (userlevel 0-4)` - Sets the user's security level.
+* `@MeowyMod getlevel (username)` - Gets the user's security level, and explains the user's permissions. --!>

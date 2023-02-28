@@ -1,5 +1,6 @@
-CloudLink>=0.1.7.4
-tinydb
+python-dotenv
+websocket-client
+websocket-server
 requests
-json
-time
+update-check
+pymongo
