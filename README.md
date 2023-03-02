@@ -1,31 +1,8 @@
 # Octavia
 Source code for the not-so-friendly chatbot, "Octavia". A fork of the "MeowyMod" bot, inspired by the [Octavia chat bot on Scratch.](https://scratch.mit.edu/projects/402821371/)
 
-> **Note**
->
-> Octavia is being rewritten.
-
-<!-- TODO: Rewrite this
-# 💡 Features 💡
-### 👨‍💻 Friendly commands
-Simply @MeowyMod in Meower to utilize the bot. Commands are listed below, or can be accessed by using `@MeowyMod help`.
-
-### 🪶 Fast and lightweight 
-MeowyMod can run on minimal resources. At least 32MB of RAM and any reasonably capable CPU can run MeowyMod.
-
-### 📃 Feature-Rich
-* Ability to update
-* Ability to self-restart
-* Create announcements and warnings
-* User promotion/demotion
-* Supports account kicks/bans/pardons, as well as IP bans/pardons.
-* Ticket logging
-* Announcements
-* **Missing features:** Reports management
-
-> **Note**
->
-> main.py can be updated using the `@MeowyBot update` command, but the MeowerBot library will require manual updates.
+# 💡 Let's chat! 💡
+Simply mention @Octavia in Meower and start chatting! Commands are listed below, or can be accessed by using `@Octavia help`.
 
 # 📦 Dependencies 📦
 * 🐍 Python >=3.11
@@ -35,15 +12,6 @@ MeowyMod can run on minimal resources. At least 32MB of RAM and any reasonably c
 * 🌐 CloudLink 3 Client (Component of MeowerBot.py)
 
 # ⌨ Commands ⌨
-* `@MeowyMod help` - Displays a list of commands.
-* `@MeowyMod meow` - MeowyMod will Meow, because it is indeed a Cat.
-* `@MeowyMod update` - Checks and applies new updates to the bot.
-* `@MeowyMod kick (username)` - Disconnects a user from Meower.
-* `@MeowyMod ban (username)` - Bans a user from Meower.
-* `@MeowyMod pardon (username)` - Pardons a ban for a user on Meower.
-* `@MeowyMod ipban (username)` - Blocks the IP address of a user on Meower.
-* `@MeowyMod ippardon (username)` - Pardons blocked IP addresses for a user on Meower.
-* `@MeowyMod announce (announcement)` - Creates a Meower-wide announcement.
-* `@MeowyMod warn (username) (message)` - Sends a warning message to a user's inbox on Meower.
-* `@MeowyMod setlevel (username) (userlevel 0-4)` - Sets the user's security level.
-* `@MeowyMod getlevel (username)` - Gets the user's security level, and explains the user's permissions. --!>
+* `@Octavia help` - Displays a list of commands.
+* `@Octavia add (response)` - If Octavia says that she doesn't know how to reply, use this command to improve her memory.
+* `@Octavia cancel` - If Octavia says that she doesn't know how to reply, use this command to abort adding a new response.
