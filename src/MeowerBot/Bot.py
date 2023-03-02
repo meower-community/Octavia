@@ -278,8 +278,10 @@ class Bot:
                     return
 
                 ctx.message.data = ctx.message.data.split(self.prefix, 1)[1]
+                ctx.message.data = ctx.message.data[1:]
 
                 self.run_command(ctx.message)
+                return
 
             self.run_cb("raw_message", args=(packet["val"],))
 
@@ -300,12 +302,27 @@ class Bot:
             })
 
     def run_command(self, message):
-        args = shlex.split(str(message))
-
-        try:
+        # Attempt to parse message as a string before
+        args = message.data.split(" ")
+        #print(f"Attempting to parse with native string split: {args}")
+        
+        if args[0] in self.commands:
+            #print(f"Native string split successful")
             self.commands[args[0]]["command"].run_cmd(message.ctx, *args[1:])
-        except KeyError as e:
-            self.run_cb("error", args=(e,))
+            return
+        
+        # Attempt to parse message as a quote
+        args = shlex.split(shlex.quote(message.data))
+        #print(f"Attempting to parse with shlex quote split: {args}")
+        
+        if args[0] in self.commands:
+            #print(f"Shlex quote split successful")
+            self.commands[args[0]]["command"].run_cmd(message.ctx, *args[1:])
+            return
+        
+        # Force to run as raw message
+        #print(f"Native and Shlex split failed, interpreting as raw")
+        self.run_cb("raw_message", args=(message._raw,))
 
     def send_msg(self, msg, to="home"):
         if to == "home":

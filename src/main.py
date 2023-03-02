@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 import pymongo
 import update_check as updater
+import random
 from MeowerBot import Bot
 import requests
 import os
@@ -17,39 +18,22 @@ if not load_dotenv():
 # Create instance of bot
 octavia = Bot()
 
-# Keep track of processing requests
-tickets = dict()
+# Keep track of processing responses
+newResponses = dict()
 
 # Prepare DB connection
 print(f"Connecting to database...")
 dbclient = pymongo.MongoClient(os.getenv("SERVER_DB", "mongodb://localhost:27017"))
-meowerdb = None
 octaviadb = None
 
 # Check DB connection status
 try:
     dbclient.server_info()
     print("Connected to database!")
-    meowerdb = dbclient.meowerserver
     octaviadb = dbclient.octavia
 except pymongo.errors.ServerSelectionTimeoutError as err:
     print(f"Failed to connect to database: \"{err}\"!")
     exit()
-
-
-# DB methods
-def getUserLevel(username):
-    return meowerdb.usersv0.find_one({"_id": username})["lvl"]
-
-
-def modifyUserLevel(username, newlevel):
-    return (meowerdb.usersv0.update_one({"_id": username}, {"$set": {"lvl": newlevel}})).matched_count > 0
-
-
-def isUserValid(username):
-    if meowerdb.usersv0.find_one({"_id": username}):
-        return True
-    return False
 
 
 # Restart script
@@ -61,7 +45,7 @@ def restart():
     print(f"Running reset script: {script}")
     os.system(script)
 
-    print(f"octavia {version} going away now...")
+    print(f"Octavia {version} going away now...")
     exit()
 
 
@@ -70,100 +54,137 @@ def shutdown():
     print("Shutting down websocket")
     octavia.wss.stop()
 
-    print(f"octavia {version} going away now...")
+    print(f"Octavia {version} going away now...")
     exit()
 
 
-''' def registerNewTicket(ctx, username, method):
-    # Log the ticket
-    ticket_result = octaviadb.tickets.insert_one({
-        "_id": str(time.time()),
-        "request": method,
-        "timestamp": time.time(),
-        "origin": ctx.user.username,
-        "recipient": username,
-        "result": None
-    })
-    
-    ticketID = ticket_result.inserted_id
-    
-    print(f"Creating ticket: {ticketID}")
-    
-    tickets[ticketID] = {
-        "origin": ctx.user.username,
-        "recipient": username
-    }
-    
-    return ticketID
+# Get a startup message from the DB
+def getRandomStartupMessage():
+    # Get all possible messages
+    messages = list(octaviadb.introductions.find())
+    intro = random.choice(messages)["msg"]
+    print(f"Picking random introductions from a set of {len(messages)} intros... I choose \"{intro}\".")
+    return intro
 
 
-def resolveTicket(ticketID, status):
-    if not ticketID in tickets:
-        print(f"Invalid ticket ID \"{ticketID}\", exiting resolveTicket method")
-    
-    print(f"Ticket {ticketID} resolving with status {status}")
-    
-    octavia.send_msg(
-        f"@{tickets[ticketID]['origin']} I have processed the your request with result {status}!")
-    
-    # Log the ticket result
-    ticket_result = octaviadb.tickets.update_one({"_id": ticketID}, {"$set": {"result": status}})
-    
-    del tickets[ticketID]
-'''
+# Retrieve a response
+def getResponse(question):
+    response = octaviadb.memory.find_one({"msg": question})
+    if response:
+        print(f"Lookup for question: \"{question}\", returned: {response['resp']}")
+        return True, response["resp"]
+    else:
+        print(f"Lookup for question: \"{question}\", found nothing.")
+        return False, None
+
+
+# Create a response
+def createResponse(question, response, creator):
+    result = octaviadb.memory.insert_one(
+        {
+            "msg": question,
+            "resp": response,
+            "creator": creator,
+            "timestamp": time.time()
+        }
+    )
+    print(f"Creating response \"{response}\" for question: \"{question}\" results with new ID: {result.inserted_id}")
+
 
 # Commands
-'''@octavia.command(args=0, aname="meow")
-def quack(ctx):
-    ctx.send_msg("Meow!")'''
-
-
 @octavia.command(args=0, aname="help")
 def help(ctx):
-    ctx.send_msg(
-        " - help: this message.\n - meow: another fun message!\n - about: Learn a little about me!\n - setlevel (username) (user level)\n - getlevel (username)\n - kick (username)\n - ban (username)\n - ipban (username)\n - pardon (username)\n - ippardon (username)\n - update\n - shutdown\n - reboot\n - announce \"(message)\"\n - warn (username) \"(message)\"")
+    ctx.send_msg("Just start talking to me, and I'll reply to the best of my ability! \nIf I don't know how to reply to a question, you can use \n@Octavia add (reply) to help me, or use @Octavia cancel to stop. \nYou can learn about me with @Octavia about. \nThere are a few commands I've inherited from MeowyMod, but only MikeDEV can use them.")
 
 
+# Display info
 @octavia.command(args=0, aname="about")
 def about(ctx):
     ctx.send_msg(
-        f"octavia v{version} \nCreated by @MikeDEV, built using @ShowierData9978's MeowerBot.py library! \n\nI'm a little orange cat with a squeaky toy hammer, and I'm here to keep Meower a safer place! Better watch out, only Meower Mods, Admins, and Sysadmins can use me!\n\nYou can find my source code here: https://github.com/MeowerBots/octavia")
+        f"I'm Octavia v{version}! \n\nI was created by @MikeDEV. I'm based upon MeowyMod. I was built using ShowierData9978's MeowerBot.py library! \n\nYou can find my source code here: https://github.com/MeowerBots/Octavia")
 
 
+# Update check
 @octavia.command(args=0, aname="update")
 def updateCheck(ctx):
-    if getUserLevel(ctx.user.username) == 4:
+    if ctx.user.username == "MikeDEV":
         # Check for updates, but better(ish)
-        versionHistory = requests.get("https://raw.githubusercontent.com/MeowerBots/octavia/main/versionInfo.json").json()
+        versionHistory = requests.get("https://raw.githubusercontent.com/MeowerBots/Octavia/main/versionInfo.json").json()
         if version not in versionHistory["latest"] or version in versionHistory["old"]:
             ctx.send_msg(f"Looks like I'm out-of-date! Latest version(s) are {versionHistory['latest']} while I'm on {version}. Downloading updates...")
             time.sleep(1)
-            updater.update(f"{os.getcwd()}/main.py", "https://raw.githubusercontent.com/MeowerBots/octavia/main/src/main.py")
+            updater.update(f"{os.getcwd()}/main.py", "https://raw.githubusercontent.com/MeowerBots/Octavia/main/src/main.py")
             ctx.send_msg("Rebooting to apply updates...")
             time.sleep(1)
             restart()
         else:
             ctx.send_msg(f"Looks like I'm up-to-date! Running v{version} right now.")
     else:
-        ctx.send_msg(f"You don't have permissions to do that so I ignored your request, {ctx.user.username}. The command \"update\" requires level 4 access, you only have level {getUserLevel(ctx.user.username)}.")
+        ctx.send_msg(f"You're not MikeDEV. Go away.")
 
 
+# Reboot request
 @octavia.command(args=0, aname="reboot")
 def rebootScript(ctx):
-    if getUserLevel(ctx.user.username) == 4:
-        ctx.send_msg("Oke! I'm rebooting now...")
+    if ctx.user.username == "MikeDEV":
+        ctx.send_msg("Gimme just a moment...")
         restart()
     else:
-        ctx.send_msg(f"You don't have permissions to do that so I ignored your request, {ctx.user.username}. The command \"reboot\" requires level 4 access, you only have level {getUserLevel(ctx.user.username)}.")
+        ctx.send_msg(f"You're not MikeDEV. Go away.")
 
 
+# Shutdown request
 @octavia.command(args=0, aname="shutdown")
 def shutdownScript(ctx):
     if ctx.user.username == "MikeDEV":
-        ctx.send_msg("Goodbye! I'm shutting down now...")
+        ctx.send_msg("Back to bed, I suppose...")
         shutdown()
     else:
-        ctx.send_msg(f"Sorry, the \"shutdown\" command is only allowed for MikeDEV.")
+        ctx.send_msg(f"You're not MikeDEV. Go away.")
+
+
+# Finish adding new response
+@octavia.command(args=0, aname="add")
+def addNewResponse(ctx, *args):
+    if ctx.user.username in newResponses:
+        # Remove command and prefix
+        msg = ctx.message._raw["p"].replace("add ", "", 1)
+        msg = msg.replace((octavia.prefix + " "), "", 1)
+        
+        # Create response in the DB
+        createResponse(newResponses[ctx.user.username], msg, ctx.user.username)
+        
+        # Return
+        ctx.send_msg(f"@{ctx.user.username} Thanks! I'll respond with \"{msg}\" in the future~")
+        del newResponses[ctx.user.username]
+    else:
+        ctx.send_msg(f"@{ctx.user.username} I didn't ask for an answer from you yet. Just continue chatting with me for now. Using add without me knowing what to add to my memory can get confusing really fast.")
+
+
+# Abort adding a new response
+@octavia.command(args=0, aname="cancel")
+def abortNewResponse(ctx):
+    if ctx.user.username in newResponses:
+        ctx.send_msg(f"@{ctx.user.username} Sure, let's continue chatting~")
+        del newResponses[ctx.user.username]
+    else:
+        ctx.send_msg(f"@{ctx.user.username} I didn't ask for an answer from you yet. Just continue chatting with me for now. Using cancel without me knowing what to purge from my memory can get confusing really fast.")
+
+
+# Full messages
+def fullQuestionEventManager(message, bot):
+    origin = message["u"]
+    question = message["p"].split(bot.prefix, 1)[1]
+    question = question[1:]
+    print(f"Got a question from {origin}: {question}")
+    valid, response = getResponse(question)
+    if valid:
+        bot.send_msg(f"@{origin} {response}")
+    else:
+        if origin in newResponses:
+            return
+        newResponses[origin] = question
+        bot.send_msg(f"@{origin} I don't know how to respond to that question yet, but you can provide me with an answer! Just use @Octavia add (response), or just tell me @Octavia cancel.")
 
 
 # Listener management
@@ -172,19 +193,20 @@ def listenerEventManager(post, bot):
     for key in ["cmd", "val", "listener"]:
         if key not in post:
             return
-
-    # Handle listeners
-    if post["cmd"] == "statuscode":
-        if post["listener"] in tickets:
-            resolveTicket(post["listener"], post["val"])
-        elif post["listener"] == "__meowerbot__login" and post["val"] == "I:100 | OK":
-            bot.send_msg(f"Octavia v{version} is alive! Use @Octavia help for info!")
+    
+    # Handle startup message
+    if post["cmd"] == "statuscode" and post["listener"] == "__meowerbot__login" and post["val"] == "I:100 | OK":
+        bot.send_msg(f"{getRandomStartupMessage()}")
 
 
-# Register event listener for tickets and startup message
+# Register event listener for questions and startup message
 octavia.callback(listenerEventManager, cbid="__raw__")
+octavia.callback(fullQuestionEventManager, cbid="raw_message")
 
+
+# Display startup message in console
 print(f"Octavia {version} starting up now...")
+
 
 # Run bot
 try:
