@@ -8,7 +8,7 @@ import os
 import time
 
 # Version tracker
-version = "1.0.0"
+version = "1.0.1"
 
 # Load environment keys
 if not load_dotenv():
