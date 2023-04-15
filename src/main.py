@@ -179,12 +179,12 @@ def fullQuestionEventManager(message, bot):
     print(f"Got a question from {origin}: {question}")
     valid, response = getResponse(question)
     if valid:
-        bot.send_msg(f"@{origin} {response}")
+        bot.send_msg(f"@{origin} {response}", to=message["post_origin"])
     else:
         if origin in newResponses:
             return
         newResponses[origin] = question
-        bot.send_msg(f"@{origin} I don't know how to respond to that question yet, but you can provide me with an answer! Just use @Octavia add (response), or just tell me @Octavia cancel.")
+        bot.send_msg(f"@{origin} I don't know how to respond to that question yet, but you can provide me with an answer! Just use @Octavia add (response), or just tell me @Octavia cancel.", to=message["post_origin"])
 
 
 # Listener management
